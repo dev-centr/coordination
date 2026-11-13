@@ -8,27 +8,25 @@ import std.string : join, startsWith;
 import coordination.ident : coordinationBanner;
 import coordination.kdl : importSessions;
 import coordination.listen : runListen;
+import coordination.prohelp_gate : showProhelp;
 import coordination.store : Store, defaultDatabasePath, diagnosticsText;
 
 int main(string[] args)
 {
+    if (showProhelp(args))
+        return 0;
     bool asJson;
     string dbPath = defaultDatabasePath();
     string[] rest;
     for (size_t i = 1; i < args.length; i++)
     {
-        if (args[i] == "--json")
+        if (flagName(args[i]) == "json")
             asJson = true;
-        else if (args[i] == "--db" && i + 1 < args.length)
+        else if (flagName(args[i]) == "db" && i + 1 < args.length)
             dbPath = args[++i];
-        else if (args[i] == "--version")
+        else if (flagName(args[i]) == "version")
         {
             writeln(coordinationBanner());
-            return 0;
-        }
-        else if (args[i] == "--help" || args[i] == "-h")
-        {
-            writeln(helpText());
             return 0;
         }
         else
@@ -36,7 +34,7 @@ int main(string[] args)
     }
     if (!rest.length)
     {
-        writeln(helpText());
+        showProhelp(["agent-coordinator", "?"]);
         return 0;
     }
     auto store = Store.open(dbPath);
@@ -93,8 +91,8 @@ private int run(ref Store store, string dbPath, string[] args, bool asJson)
         return 0;
     }
     stderr.writeln("Unknown command " ~ cmd ~ ".");
-    stderr.writeln("Run agent-coordinator with no arguments to see plan and schedule.");
-    stderr.writeln(helpText());
+    stderr.writeln("Run agent-coordinator ? to see plan, schedule, and serve.");
+    showProhelp(["agent-coordinator", "?"]);
     return 1;
 }
 
@@ -210,9 +208,9 @@ private string[string] flags(string[] args)
     string[string] opt;
     for (size_t i = 0; i < args.length; i++)
     {
-        if (!args[i].startsWith("--"))
+        auto name = flagName(args[i]);
+        if (!name.length)
             continue;
-        auto name = args[i][2 .. $];
         if (name == "files-moved")
         {
             opt[name] = "true";
@@ -251,49 +249,16 @@ private string jsonHit(string status, string reason, string hint, string canonic
     return doc.toString();
 }
 
+private string flagName(string arg)
+{
+    if (arg.startsWith("--") && arg.length > 2)
+        return arg[2 .. $];
+    if (arg.length > 1 && arg[0] == '-' && arg[1] != '-')
+        return arg[1 .. $];
+    return "";
+}
+
 private string get(string[string] opt, string key, string fallback)
 {
     return (key in opt) is null ? fallback : opt[key];
-}
-
-private string helpText()
-{
-    return coordinationBanner() ~ `
-
-One command for the plan an agent opens and the schedule on that plan.
-A schedule row points at a plan step. It stores the estimate, the status, and which live signal to check.
-
-Start here
-  agent-coordinator serve
-      Opens http://127.0.0.1:17359 on this machine. The page lists plans and their waits.
-  agent-coordinator plan import
-      Loads plan files already saved for chats on this machine.
-  agent-coordinator plan boards
-      Lists those plans. The id in the first column is what later commands call a board.
-
-Plan
-  agent-coordinator plan tree --board ID
-  agent-coordinator plan path --board ID --node ID
-  agent-coordinator plan node --board ID --id ID --title TEXT [--status open]
-  agent-coordinator plan record-move --canonical ID --from-cursor-chat ID --to-cursor-chat ID
-      --from-project-key SLUG --to-project-key SLUG --from-root DIR --to-root DIR
-  agent-coordinator plan resolve --chat ID [--cursor-chat ID] [--segment N] [--quote TEXT]
-  agent-coordinator plan repair --chat ID [--cursor-chat ID --live-root DIR] [--files-moved]
-
-Schedule
-  agent-coordinator schedule wait --board ID --node ID [--estimate-ms N] [--status pending] [--wait-hub ID]
-      Writes the wait on that plan step.
-  The column view is a separate process on port 17358. When this database is not running,
-  that process keeps reading its JSON files. Those files are its copy of the schedule.
-  They are not the routine ledger. The routine ledger is recurring work stored in git.
-
-Other
-  agent-coordinator doctor
-      Prints the version and where the database file is.
-  agent-coordinator account issue --token TOKEN --plan hosted|workstation [--label TEXT]
-  --db PATH    use a different database file
-  --json       print one object, for record-move and resolve
-
-If resolve cannot open a link, it exits with code 2 and prints the reason.
-`;
 }

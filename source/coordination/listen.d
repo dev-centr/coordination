@@ -6,6 +6,7 @@ import std.path : buildPath, dirName;
 import std.stdio : stderr, writeln;
 
 import coordination.ident : coordinationBanner;
+import coordination.prohelp_gate : showProhelpPath;
 import coordination.serve : serve;
 import coordination.store : Store, defaultDatabasePath;
 
@@ -19,30 +20,30 @@ int runListen(string[] args)
     for (size_t i = 0; i < args.length; i++)
     {
         auto a = args[i];
-        if (a == "--help" || a == "-h")
+        if (a == "--help" || a == "-h" || a == "-help" || a == "?" || a == "help")
         {
-            writeln(listenHelp());
+            showProhelpPath("serve");
             return 0;
         }
-        if (a == "--version")
+        if (a == "--version" || a == "-version")
         {
             writeln(coordinationBanner());
             return 0;
         }
-        if (a == "--public")
+        if (a == "--public" || a == "-public")
         {
             publicMode = true;
             if (bindAddr == "127.0.0.1")
                 bindAddr = "0.0.0.0";
             continue;
         }
-        if (a == "--db" && i + 1 < args.length)
+        if ((a == "--db" || a == "-db") && i + 1 < args.length)
             dbPath = args[++i];
-        else if (a == "--bind" && i + 1 < args.length)
+        else if ((a == "--bind" || a == "-bind") && i + 1 < args.length)
             bindAddr = args[++i];
-        else if (a == "--port" && i + 1 < args.length)
+        else if ((a == "--port" || a == "-port") && i + 1 < args.length)
             port = to!ushort(args[++i]);
-        else if (a == "--app" && i + 1 < args.length)
+        else if ((a == "--app" || a == "-app") && i + 1 < args.length)
             appDir = args[++i];
         else
         {
@@ -69,23 +70,4 @@ private string findApp()
     if (exists(buildPath(beside, "index.html")))
         return beside;
     return "app";
-}
-
-string listenHelp()
-{
-    return coordinationBanner() ~ `
-
-Opens the plan database and a page that lists plans and the waits on them.
-
-  agent-coordinator serve
-      Listens on http://127.0.0.1:17359. This machine needs no token.
-  agent-coordinator serve --public [--bind ADDR] [--port N]
-      Accepts a hosted token. Dev-Centr issues that token for the online database.
-      A workstation token is refused on this bind.
-
-  --db PATH    database file
-  --bind ADDR  address
-  --port N     port
-  --app DIR    folder that holds the browser page
-`;
 }

@@ -16,3 +16,5 @@
 !/.editorconfig
 !/tools/
 !/tools/**
+!/help/
+!/help/**

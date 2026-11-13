@@ -3,6 +3,11 @@
 
 == 2026-11-12
 
+=== Help is prohelp
+
+* `agent-coordinator ?` renders `help/agent-coordinator.sdl` through the prohelp library. The help text is not a second copy in the program.
+* A flag may use one dash (`-board`) or the older two-dash spelling.
+
 === Agent coordinator command
 
 * The command is `agent-coordinator`. `plan` is the tree. `schedule wait` writes the wait on a plan step.

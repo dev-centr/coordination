@@ -1,6 +1,14 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"d2sqlite3": "1.0.0"
+		"assertions": {"path":"../devcentr/unit-threaded/subpackages/assertions"},
+		"d2sqlite3": "1.0.0",
+		"exception": {"path":"../devcentr/unit-threaded/subpackages/exception"},
+		"from": {"path":"../devcentr/unit-threaded/subpackages/from"},
+		"prohelp": {"version":"~main","repository":"git+https://github.com/openshellorg/prohelp.git"},
+		"runner": {"path":"../devcentr/unit-threaded/subpackages/runner"},
+		"sdlang-d": "0.10.6",
+		"taggedalgebraic": "0.11.24",
+		"unit-threaded": "0.7.55"
 	}
 }

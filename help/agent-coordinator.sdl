@@ -1,0 +1,42 @@
+command "agent-coordinator" {
+    title "agent-coordinator"
+    summary "The plan an agent opens, and the schedule on each step."
+    description "A schedule row points at a plan step. It stores the estimate, the status, and which live signal to check. serve starts in the background. -listen keeps the lines in this window."
+    homepage "https://github.com/dev-centr/coordination"
+    docs "https://github.com/dev-centr/coordination#command"
+    issues "https://github.com/dev-centr/coordination/issues"
+
+    section "start" {
+        summary "Three commands to try first"
+        inline true
+        content "serve starts the database and prints how to stop it. plan import loads plans already saved for chats on this machine. plan boards lists them. The id in the first column is what later commands call a board."
+        example "Start the database" "agent-coordinator serve"
+        example "Load saved plans" "agent-coordinator plan import"
+        example "List the plans" "agent-coordinator plan boards"
+    }
+
+    section "plan" {
+        summary "The tree, and the chat folder a node came from"
+        example "Show the tree" "agent-coordinator plan tree -board ID"
+        example "Show the path to a node" "agent-coordinator plan path -board ID -node ID"
+        example "Save a node" "agent-coordinator plan node -board ID -id ID -title TEXT"
+        example "Record a renamed chat folder" "agent-coordinator plan record-move -canonical ID -from-cursor-chat ID -to-cursor-chat ID -from-project-key SLUG -to-project-key SLUG -from-root DIR -to-root DIR"
+        example "Open a transcript link" "agent-coordinator plan resolve -chat ID"
+        example "Mark a gathered folder current" "agent-coordinator plan repair -chat ID -cursor-chat ID -live-root DIR"
+    }
+
+    section "schedule" {
+        summary "The wait on a plan step"
+        content "schedule wait writes the estimate, the status, and which live signal to check. It does not keep a second title."
+        example "Write a wait" "agent-coordinator schedule wait -board ID -node ID -estimate-ms N -status pending -wait-hub ID"
+    }
+
+    section "serve" {
+        summary "Background by default. -listen stays in this window."
+        content "serve detaches and prints the id, the process id, the log path, and serve stop 1. The manager remembers which terminal spawned the instance and which terminal is showing it. serve status lists them. serve stop 1 stops that one. serve stop with no id stops every one. For lines in this window, serve -listen."
+        example "Start in the background" "agent-coordinator serve"
+        example "Watch this window" "agent-coordinator serve -listen"
+        example "List instances" "agent-coordinator serve status"
+        example "Stop one" "agent-coordinator serve stop 1"
+    }
+}
