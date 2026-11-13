@@ -8,3 +8,4 @@ The coordination suite keeps one plan tree in a local database. A wait is a sche
 * Port 17359. Loopback calls need no token. `--public` accepts only a hosted token. A workstation token is the local plan and is refused on the public port with a hint.
 * `record-move` and `resolve` use the same hint fields as the session location file: found, resolved through an older folder, split across folders, never recorded, or missing on disk.
 * The plan-stack wait queue can mirror a phase here. The first write creates the plan node. Later writes change the wait only.
+* Running the command with no arguments leads with a short start path: the daemon, import, and boards. The rest of the screen is the command list.

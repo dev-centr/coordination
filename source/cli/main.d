@@ -218,21 +218,35 @@ private string helpText()
 {
     return coordinationBanner() ~ `
 
-The plan is the record an agent opens. A wait is a schedule row that points at a plan node.
+Stores plans, and the waits that belong to each plan.
 
-  coordination doctor
-  coordination import [--sessions DIR]
+Start here
+  coordinationd
+      Opens http://127.0.0.1:17359 on this machine.
+  coordination import
+      Loads plan files already saved for chats on this machine.
   coordination boards
+      Lists those plans. The id in the first column is what other commands call a board.
+
+Look and edit
   coordination tree --board ID
   coordination path --board ID --node ID
   coordination node --board ID --id ID --title TEXT [--status open]
   coordination wait --board ID --node ID [--estimate-ms N] [--status pending] [--wait-hub ID]
-  coordination record-move --canonical ID --from-cursor-chat ID --to-cursor-chat ID --from-project-key SLUG --to-project-key SLUG --from-root DIR --to-root DIR
+
+When a chat folder was renamed
+  coordination record-move --canonical ID --from-cursor-chat ID --to-cursor-chat ID
+      --from-project-key SLUG --to-project-key SLUG --from-root DIR --to-root DIR
   coordination resolve --chat ID [--cursor-chat ID] [--segment N] [--quote TEXT]
   coordination repair --chat ID [--cursor-chat ID --live-root DIR] [--files-moved]
-  coordination account issue --token TOKEN --plan hosted|workstation [--label TEXT]
 
---db PATH selects the database. --json prints a single object for record-move and resolve.
-Exit 2 when a link does not resolve. The hint says why.
+Other
+  coordination doctor
+      Prints the version and where the database file is.
+  coordination account issue --token TOKEN --plan hosted|workstation [--label TEXT]
+  --db PATH    use a different database file
+  --json       print one object, for record-move and resolve
+
+If resolve cannot open a link, it exits with code 2 and prints the reason.
 `;
 }

@@ -10,3 +10,8 @@
 * `coordination` is the thin command: import, tree, wait, record-move, resolve, repair, and doctor.
 * Transcript folders stay aliases of the first chat id. A missed link returns a hint instead of looking like a deleted chat.
 * Detail: link:changelog-details/2026-11-12%20-%20coordination-store.adoc[Coordination store].
+
+=== First-run help
+
+* Running `coordination` with no arguments leads with what the program stores and the three commands to try first.
+* The full command list stays on that screen, under Look and edit, When a chat folder was renamed, and Other.
