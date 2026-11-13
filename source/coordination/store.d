@@ -157,14 +157,14 @@ struct Store
         {
             db.execute(
                 `INSERT INTO nodes (board_id, id, parent, position, title, summary, status, plan, repo, quote, link_cursor_chat, link_segment, link_turn)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)`,
+                 VALUES (?1, ?2, COALESCE(?3, ''), ?4, ?5, COALESCE(?6, ''), COALESCE(?7, 'open'), COALESCE(?8, ''), COALESCE(?9, ''), COALESCE(?10, ''), COALESCE(?11, ''), ?12, ?13)`,
                 boardId, id, parent, position, title, summary, status, plan, repo, quote, linkChat,
                 hasSegment ? linkSegment : -1, hasTurn ? linkTurn : -1);
         }
         else
         {
             db.execute(
-                `UPDATE nodes SET parent=?3, position=?4, title=?5, summary=?6, status=?7, plan=?8, repo=?9, quote=?10, link_cursor_chat=?11
+                `UPDATE nodes SET parent=COALESCE(?3, ''), position=?4, title=?5, summary=COALESCE(?6, ''), status=COALESCE(?7, 'open'), plan=COALESCE(?8, ''), repo=COALESCE(?9, ''), quote=COALESCE(?10, ''), link_cursor_chat=COALESCE(?11, '')
                  WHERE board_id=?1 AND id=?2`,
                 boardId, id, parent, position, title, summary, status, plan, repo, quote, linkChat);
             if (hasSegment)

@@ -1,6 +1,12 @@
 = Changelog
 :toclevels: 3
 
+== 2026-11-13
+
+=== Import keeps an omitted plan
+
+* `plan import` can run again after the first load. An omitted `plan` field is stored as an empty string, not as a null that the node table rejects.
+
 == 2026-11-12
 
 === Help is prohelp
