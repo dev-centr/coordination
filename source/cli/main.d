@@ -7,6 +7,7 @@ import std.string : join, startsWith;
 
 import coordination.ident : coordinationBanner;
 import coordination.kdl : importSessions;
+import coordination.listen : runListen;
 import coordination.store : Store, defaultDatabasePath, diagnosticsText;
 
 int main(string[] args)
@@ -55,12 +56,52 @@ int main(string[] args)
 private int run(ref Store store, string dbPath, string[] args, bool asJson)
 {
     auto cmd = args[0];
-    auto opt = flags(args[1 .. $]);
+    if (cmd == "serve")
+        return runListen(args[1 .. $]);
+    if (cmd == "plan")
+    {
+        if (args.length < 2)
+        {
+            stderr.writeln("Missing a plan command.");
+            stderr.writeln("Try: agent-coordinator plan boards");
+            return 1;
+        }
+        return runPlan(store, dbPath, args[1 .. $], asJson);
+    }
+    if (cmd == "schedule")
+    {
+        if (args.length < 2)
+        {
+            stderr.writeln("Missing a schedule command.");
+            stderr.writeln("Try: agent-coordinator schedule wait --board ID --node ID");
+            return 1;
+        }
+        return runSchedule(store, args[1 .. $]);
+    }
     if (cmd == "doctor")
     {
         writeln(diagnosticsText(store, dbPath));
         return 0;
     }
+    if (cmd == "account" && args.length > 1 && args[1] == "issue")
+    {
+        auto opt = flags(args[2 .. $]);
+        need(opt, "token");
+        need(opt, "plan");
+        store.issueToken(opt["token"], opt["plan"], opt.get("label", ""));
+        writeln("issued " ~ opt["plan"] ~ " token");
+        return 0;
+    }
+    stderr.writeln("Unknown command " ~ cmd ~ ".");
+    stderr.writeln("Run agent-coordinator with no arguments to see plan and schedule.");
+    stderr.writeln(helpText());
+    return 1;
+}
+
+private int runPlan(ref Store store, string dbPath, string[] args, bool asJson)
+{
+    auto cmd = args[0];
+    auto opt = flags(args[1 .. $]);
     if (cmd == "import")
     {
         import std.path : buildPath, dirName;
@@ -109,17 +150,6 @@ private int run(ref Store store, string dbPath, string[] args, bool asJson)
         writeln("saved node " ~ opt["id"]);
         return 0;
     }
-    if (cmd == "wait")
-    {
-        need(opt, "board");
-        need(opt, "node");
-        auto id = opt.get("id", opt["node"] ~ "-wait");
-        store.upsertWait(id, opt["board"], opt["node"], opt.get("position", "0").to!long,
-            opt.get("estimate-ms", "0").to!long, opt.get("status", "pending"), opt.get("wait-hub", ""),
-            opt.get("harness", ""), opt.get("session", ""));
-        writeln("saved wait " ~ id ~ " on node " ~ opt["node"]);
-        return 0;
-    }
     if (cmd == "record-move")
     {
         foreach (name; ["canonical", "from-cursor-chat", "to-cursor-chat", "from-project-key", "to-project-key", "from-root", "to-root"])
@@ -150,16 +180,28 @@ private int run(ref Store store, string dbPath, string[] args, bool asJson)
         writeln("status: repaired\nhint: Marked the live folder current and kept the old keys.");
         return 0;
     }
-    if (cmd == "account" && args.length > 1 && args[1] == "issue")
+    stderr.writeln("Unknown plan command " ~ cmd ~ ".");
+    stderr.writeln("Try: agent-coordinator plan boards");
+    return 1;
+}
+
+private int runSchedule(ref Store store, string[] args)
+{
+    auto cmd = args[0];
+    auto opt = flags(args[1 .. $]);
+    if (cmd == "wait")
     {
-        need(opt, "token");
-        need(opt, "plan");
-        store.issueToken(opt["token"], opt["plan"], opt.get("label", ""));
-        writeln("issued " ~ opt["plan"] ~ " token");
+        need(opt, "board");
+        need(opt, "node");
+        auto id = opt.get("id", opt["node"] ~ "-wait");
+        store.upsertWait(id, opt["board"], opt["node"], opt.get("position", "0").to!long,
+            opt.get("estimate-ms", "0").to!long, opt.get("status", "pending"), opt.get("wait-hub", ""),
+            opt.get("harness", ""), opt.get("session", ""));
+        writeln("saved wait " ~ id ~ " on node " ~ opt["node"]);
         return 0;
     }
-    stderr.writeln("Unknown command " ~ cmd);
-    stderr.writeln(helpText());
+    stderr.writeln("Unknown schedule command " ~ cmd ~ ".");
+    stderr.writeln("Try: agent-coordinator schedule wait --board ID --node ID");
     return 1;
 }
 
@@ -218,32 +260,37 @@ private string helpText()
 {
     return coordinationBanner() ~ `
 
-Stores plans, and the waits that belong to each plan.
+One command for the plan an agent opens and the schedule on that plan.
+A schedule row points at a plan step. It stores the estimate, the status, and which live signal to check.
 
 Start here
-  coordinationd
-      Opens http://127.0.0.1:17359 on this machine.
-  coordination import
+  agent-coordinator serve
+      Opens http://127.0.0.1:17359 on this machine. The page lists plans and their waits.
+  agent-coordinator plan import
       Loads plan files already saved for chats on this machine.
-  coordination boards
-      Lists those plans. The id in the first column is what other commands call a board.
+  agent-coordinator plan boards
+      Lists those plans. The id in the first column is what later commands call a board.
 
-Look and edit
-  coordination tree --board ID
-  coordination path --board ID --node ID
-  coordination node --board ID --id ID --title TEXT [--status open]
-  coordination wait --board ID --node ID [--estimate-ms N] [--status pending] [--wait-hub ID]
-
-When a chat folder was renamed
-  coordination record-move --canonical ID --from-cursor-chat ID --to-cursor-chat ID
+Plan
+  agent-coordinator plan tree --board ID
+  agent-coordinator plan path --board ID --node ID
+  agent-coordinator plan node --board ID --id ID --title TEXT [--status open]
+  agent-coordinator plan record-move --canonical ID --from-cursor-chat ID --to-cursor-chat ID
       --from-project-key SLUG --to-project-key SLUG --from-root DIR --to-root DIR
-  coordination resolve --chat ID [--cursor-chat ID] [--segment N] [--quote TEXT]
-  coordination repair --chat ID [--cursor-chat ID --live-root DIR] [--files-moved]
+  agent-coordinator plan resolve --chat ID [--cursor-chat ID] [--segment N] [--quote TEXT]
+  agent-coordinator plan repair --chat ID [--cursor-chat ID --live-root DIR] [--files-moved]
+
+Schedule
+  agent-coordinator schedule wait --board ID --node ID [--estimate-ms N] [--status pending] [--wait-hub ID]
+      Writes the wait on that plan step.
+  The column view is a separate process on port 17358. When this database is not running,
+  that process keeps reading its JSON files. Those files are its copy of the schedule.
+  They are not the routine ledger. The routine ledger is recurring work stored in git.
 
 Other
-  coordination doctor
+  agent-coordinator doctor
       Prints the version and where the database file is.
-  coordination account issue --token TOKEN --plan hosted|workstation [--label TEXT]
+  agent-coordinator account issue --token TOKEN --plan hosted|workstation [--label TEXT]
   --db PATH    use a different database file
   --json       print one object, for record-move and resolve
 

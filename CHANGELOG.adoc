@@ -3,6 +3,13 @@
 
 == 2026-11-12
 
+=== Agent coordinator command
+
+* The command is `agent-coordinator`. `plan` is the tree. `schedule wait` writes the wait on a plan step.
+* `agent-coordinator serve` opens the database and the browser on port 17359.
+* The column view on port 17358 still reads its JSON files when this database is down. Those files are not the routine ledger.
+* Detail: link:changelog-details/2026-11-12%20-%20agent-coordinator-command.adoc[Agent coordinator command].
+
 === Coordination store
 
 * The plan tree is the record an agent opens. A wait row points at a plan node and keeps the estimate, the status, and the wait-hub id.

@@ -5,5 +5,5 @@ enum coordinationBuild = "dev";
 
 string coordinationBanner()
 {
-    return "coordination " ~ coordinationVersion ~ " (" ~ coordinationBuild ~ ")";
+    return "agent-coordinator " ~ coordinationVersion ~ " (" ~ coordinationBuild ~ ")";
 }

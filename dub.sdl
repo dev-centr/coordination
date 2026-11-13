@@ -1,5 +1,5 @@
 name "coordination"
-description "Shared store for the agentic coordination suite"
+description "Plan and schedule for one agent coordinator"
 license "MIT"
 targetType "library"
 sourcePaths "source/coordination"
@@ -15,7 +15,7 @@ configuration "library" {
 
 configuration "cli" {
     targetType "executable"
-    targetName "coordination"
+    targetName "agent-coordinator"
     mainSourceFile "source/cli/main.d"
 }
 

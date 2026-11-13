@@ -1,0 +1,10 @@
+= 2026-11-12
+
+== Agent coordinator command
+
+The command a person types is `agent-coordinator`. Planning and scheduling are groups on that command because a wait is a row on a plan step.
+
+* `agent-coordinator plan` lists and edits the plan tree, including the chat-folder aliases.
+* `agent-coordinator schedule wait` writes the estimate, the status, and the wait-hub id on a node that already exists.
+* `agent-coordinator serve` is the database and the local browser. The older `coordinationd` executable still starts that same server.
+* When the database is down, the column view keeps its JSON files. It does not read the routine ledger. The routine ledger remains recurring work in git.

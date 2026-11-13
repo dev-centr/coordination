@@ -381,7 +381,7 @@ private string versionBody()
 {
     JSONValue doc;
     doc["ok"] = true;
-    doc["service"] = "coordinationd";
+    doc["service"] = "agent-coordinator";
     doc["version"] = coordinationVersion;
     doc["build"] = coordinationBuild;
     return doc.toString();

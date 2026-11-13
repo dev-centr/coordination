@@ -8,7 +8,7 @@
 
 # coordination
 
-Shared store for the agentic coordination suite. An agent opens a plan here, and the plan says when to wait and which live signal to check.
+The command is `agent-coordinator`. It keeps the plan an agent opens, and the schedule row on each step of that plan.
 
 [Changelog](CHANGELOG.adoc)
 
@@ -31,7 +31,7 @@ Shared store for the agentic coordination suite. An agent opens a plan here, and
 
 ## About
 
-Coordination keeps one plan tree. A node is a piece of work: its title, what it needs, and a link back to the transcript sentence it came from. A wait is not a second copy of that plan. It is a schedule row that points at a node and records the estimate, the status, and the wait-hub id to check.
+`agent-coordinator plan` is the plan tree. A node is a piece of work: its title, what it needs, and a link back to the transcript sentence it came from. `agent-coordinator schedule` writes the wait on that node: the estimate, the status, and the wait-hub id to check. The wait is not a second copy of the plan.
 
 The same database is the fast copy on this machine and, with a hosted token, the copy Dev-Centr serves for other machines. The git routine ledger remains the record for when no database is up.
 
@@ -45,7 +45,6 @@ LDC and dub. The library's registry is the [DUB registry](https://code.dlang.org
 git clone https://github.com/dev-centr/coordination.git "$env:code\github.com\dev-centr\coordination"
 cd "$env:code\github.com\dev-centr\coordination"
 dub build -c cli --compiler=ldc2
-dub build -c daemon --compiler=ldc2
 dub test --compiler=ldc2
 ```
 
@@ -55,19 +54,19 @@ The database file is `%LOCALAPPDATA%\AgentWorkspace\coordination\coordination.db
 
 ## Command
 
-`coordination --help` lists the subcommands. `coordination doctor` prints the version, the database path, and the counts. `coordination resolve` exits 2 when a link does not open and prints a hint: the chat was never recorded, the workspace split the transcript, or the folder is gone.
+`agent-coordinator` with no arguments lists `plan` and `schedule`. `agent-coordinator doctor` prints the version, the database path, and the counts. `agent-coordinator plan resolve` exits 2 when a link does not open and prints a hint: the chat was never recorded, the workspace split the transcript, or the folder is gone.
 
 ```powershell
-dub run -c daemon --compiler=ldc2
-dub run -c cli --compiler=ldc2 -- import
-dub run -c cli --compiler=ldc2 -- tree --board <chat-id>
+dub run -c cli --compiler=ldc2 -- serve
+dub run -c cli --compiler=ldc2 -- plan import
+dub run -c cli --compiler=ldc2 -- plan tree --board <chat-id>
 ```
 
 <p align="right">(<a href="#coordination">back to top</a>)</p>
 
 ## Local app and API
 
-`coordinationd` listens on `http://127.0.0.1:17359`. The front page is the local browser: boards, the plan tree, the waits under those nodes, transcript folders, and a resolve box.
+`agent-coordinator serve` listens on `http://127.0.0.1:17359`. The front page is the local browser: boards, the plan tree, the waits under those nodes, transcript folders, and a resolve box.
 
 `GET /health` returns the version and build id. `GET /api/diagnostics` is the debug dump: paths and counts, no tokens.
 
@@ -75,7 +74,7 @@ dub run -c cli --compiler=ldc2 -- tree --board <chat-id>
 
 ## Hosted database
 
-`coordinationd --public` binds a reachable address and refuses calls that do not carry a hosted token. Issue tokens on the machine itself:
+`agent-coordinator serve --public` binds a reachable address and refuses calls that do not carry a hosted token. Issue tokens on the machine itself:
 
 ```powershell
 dub run -c cli --compiler=ldc2 -- account issue --token <secret> --plan hosted --label "dev-centr"
@@ -83,13 +82,13 @@ dub run -c cli --compiler=ldc2 -- account issue --token <secret> --plan hosted -
 
 A workstation token is for this computer. On the public port it gets HTTP 402 and a hint that the online database is the Dev-Centr hosted plan. This build does not charge a card. Dev-Centr issues the hosted token after it sells the plan.
 
-If the daemon is unhealthy, `GET /health` fails and `coordination doctor` still reads the local file. Restart `coordinationd`. The JSON files of the wait queue are untouched when this daemon is down.
+If the server is unhealthy, `GET /health` fails and `agent-coordinator doctor` still reads the local file. Start it again with `agent-coordinator serve`. The column view on port 17358 keeps reading its JSON files when this database is down. Those files are that view's copy of the schedule. They are not the routine ledger. The routine ledger is recurring work stored in git.
 
 <p align="right">(<a href="#coordination">back to top</a>)</p>
 
 ## Wait queue
 
-[plan-stack](https://github.com/dev-centr/plan-stack) is the schedule view: session columns and cells sized by the estimate. When it saves a phase it sends the plan body into this database once, then updates only the wait row. A later save does not replace a title the plan tree already has. The phase keeps `planNodeId` so the column points at the node.
+[plan-stack](https://github.com/dev-centr/plan-stack) draws the schedule as session columns, with each cell sized by the estimate. The command for the plan and the wait row is `agent-coordinator`. When that column view saves a phase it sends the plan body into this database once, then updates only the wait row. A later save does not replace a title the plan tree already has. The phase keeps `planNodeId` so the column points at the node.
 
 [wait-hub](https://github.com/dev-centr/wait-hub) remains the completion signal a wait row can name.
 
