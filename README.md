@@ -66,7 +66,7 @@ dub run -c cli --compiler=ldc2 -- plan tree --board <chat-id>
 
 ## Local app and API
 
-`agent-coordinator serve` listens on `http://127.0.0.1:17359`. The front page is the local browser: boards, the plan tree, the waits under those nodes, transcript folders, and a resolve box.
+`agent-coordinator serve` starts that listener in the background on `http://127.0.0.1:17359` and prints `serve stop 1`. `serve -listen` keeps the lines in this window. `serve status` lists each instance and the terminal that started it. The front page is the local browser: boards, the plan tree, the waits under those nodes, transcript folders, and a resolve box.
 
 `GET /health` returns the version and build id. `GET /api/diagnostics` is the debug dump: paths and counts, no tokens.
 

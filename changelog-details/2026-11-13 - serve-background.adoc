@@ -1,0 +1,12 @@
+= 2026-11-13
+
+== Serve starts in the background
+
+`serve` can run more than one listener, so it follows the Service Manager standard. The person does not start the manager by name.
+
+* `agent-coordinator serve` returns after printing the id, the process id, who started it, `serve stop 1`, `serve status`, and a reminder for `-listen`. The log path is the last line.
+* `agent-coordinator serve -listen` keeps the lines in this window. The manager records that terminal as the one showing the output.
+* `serve status` prints each instance as `detached` or `listen`, then groups them by terminal.
+* `serve stop 1`, `serve stop server 1`, and `serve stop` (every instance) are the stop commands. An unknown id names `serve status` and fails.
+* The manager leaves when the last instance is gone.
+* The database file uses WAL, so a second listener waits on a busy write instead of failing immediately.

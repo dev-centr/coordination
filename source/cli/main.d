@@ -37,6 +37,16 @@ int main(string[] args)
         showProhelp(["agent-coordinator", "?"]);
         return 0;
     }
+    if (rest[0] == "serve")
+    {
+        try
+            return runListen(rest[1 .. $], asJson, dbPath);
+        catch (Exception e)
+        {
+            stderr.writeln(e.msg);
+            return 1;
+        }
+    }
     auto store = Store.open(dbPath);
     scope (exit)
         store.close();
@@ -54,8 +64,6 @@ int main(string[] args)
 private int run(ref Store store, string dbPath, string[] args, bool asJson)
 {
     auto cmd = args[0];
-    if (cmd == "serve")
-        return runListen(args[1 .. $]);
     if (cmd == "plan")
     {
         if (args.length < 2)

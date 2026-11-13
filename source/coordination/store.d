@@ -31,6 +31,8 @@ struct Store
         Store s;
         s.db = Database(path);
         s.db.execute("PRAGMA foreign_keys = ON");
+        s.db.execute("PRAGMA busy_timeout = 2000");
+        s.db.execute("PRAGMA journal_mode = WAL");
         s.migrate();
         return s;
     }

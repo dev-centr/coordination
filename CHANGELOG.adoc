@@ -3,6 +3,14 @@
 
 == 2026-11-13
 
+=== Serve starts in the background
+
+* `agent-coordinator serve` detaches. It prints the id, the process id, the terminal that started it, `serve stop 1`, and the log path.
+* `serve -listen` stays in this window. `serve status` lists every instance. `serve stop 1` and `serve stop server 1` stop one. `serve stop` stops all of them.
+* One manager tracks those instances and exits when the last one is gone.
+* Two listeners can open the same database file. It uses WAL so a second process waits instead of failing at once.
+* Detail: link:changelog-details/2026-11-13%20-%20serve-background.adoc[Serve starts in the background].
+
 === Import keeps an omitted plan
 
 * `plan import` can run again after the first load. An omitted `plan` field is stored as an empty string, not as a null that the node table rejects.
