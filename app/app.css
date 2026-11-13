@@ -1,0 +1,22 @@
+:root {
+  color-scheme: light dark;
+  font-family: "Segoe UI", sans-serif;
+  line-height: 1.4;
+}
+body { margin: 0; }
+header, .layout { padding: 1rem 1.25rem; }
+header { border-bottom: 1px solid #8884; }
+.layout { display: grid; grid-template-columns: 16rem 1fr; gap: 1.5rem; }
+aside ul, #waits, #aliases { list-style: none; padding: 0; }
+button, li button { font: inherit; }
+li button { background: none; border: 0; padding: 0.2rem 0; cursor: pointer; text-align: left; }
+.node { margin: 0.35rem 0 0.35rem 1rem; }
+.node strong { font-weight: 650; }
+.status { opacity: 0.75; }
+form { display: grid; gap: 0.4rem; max-width: 36rem; margin-top: 1rem; }
+label { display: grid; gap: 0.15rem; }
+input { font: inherit; padding: 0.3rem 0.4rem; }
+#hint { white-space: pre-wrap; }
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+}

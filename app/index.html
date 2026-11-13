@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coordination</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header>
+    <h1>Coordination</h1>
+    <p>Plans, the waits that point at them, and the transcript folders for each chat.</p>
+    <button id="import" type="button">Import session files</button>
+  </header>
+  <div class="layout">
+    <aside>
+      <h2>Boards</h2>
+      <ul id="boards"></ul>
+    </aside>
+    <main>
+      <h2 id="board-title">Select a board</h2>
+      <div id="tree"></div>
+      <h2>Waiting</h2>
+      <ul id="waits"></ul>
+      <h2>Transcript folders</h2>
+      <ul id="aliases"></ul>
+      <form id="resolve">
+        <h2>Open a link</h2>
+        <label>Chat <input name="chat" required></label>
+        <label>Transcript <input name="cursorChat"></label>
+        <label>Segment <input name="segment"></label>
+        <label>Quote <input name="quote"></label>
+        <button type="submit">Resolve</button>
+        <p id="hint"></p>
+      </form>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

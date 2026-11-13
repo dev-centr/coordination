@@ -1,0 +1,12 @@
+= Changelog
+:toclevels: 3
+
+== 2026-11-12
+
+=== Coordination store
+
+* The plan tree is the record an agent opens. A wait row points at a plan node and keeps the estimate, the status, and the wait-hub id.
+* `coordinationd` on port 17359 serves that database, a local browser, and a hosted API that requires a Dev-Centr hosted token.
+* `coordination` is the thin command: import, tree, wait, record-move, resolve, repair, and doctor.
+* Transcript folders stay aliases of the first chat id. A missed link returns a hint instead of looking like a deleted chat.
+* Detail: link:changelog-details/2026-11-12%20-%20coordination-store.adoc[Coordination store].

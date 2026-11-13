@@ -1,0 +1,26 @@
+name "coordination"
+description "Shared store for the agentic coordination suite"
+license "MIT"
+targetType "library"
+sourcePaths "source/coordination"
+dependency "d2sqlite3" version="~>1.0.0"
+subConfiguration "d2sqlite3" "all-included"
+preBuildCommands "tools\\copy-sqlite.cmd" platform="windows"
+lflags "/LIBPATH:$PACKAGE_DIR" platform="windows"
+copyFiles "sqlite3.dll" platform="windows"
+
+configuration "library" {
+    targetType "library"
+}
+
+configuration "cli" {
+    targetType "executable"
+    targetName "coordination"
+    mainSourceFile "source/cli/main.d"
+}
+
+configuration "daemon" {
+    targetType "executable"
+    targetName "coordinationd"
+    mainSourceFile "source/daemon/main.d"
+}
